@@ -39,6 +39,10 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'coreapp',
     'cloudinary',
+    'oauth2_provider',
+    'social_django',
+    'rest_framework_social_oauth2',
+    'bootstrap4',
 ]
 
 MIDDLEWARE = [
@@ -64,6 +68,8 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'social_django.context_processors.backends',
+                'social_django.context_processors.login_redirect',
             ],
         },
     },
@@ -133,12 +139,42 @@ import cloudinary.uploader
 import cloudinary.api
 
 cloudinary.config(
-    cloud_name =  "dozjvfcyy",
+    cloud_name = "dozjvfcyy",
     api_key = "752655413189426",
-    api_secret = "uowJY6bzKeBFbHzPSA-oUqxGzZY",
-
+    api_secret = "uowJY6bzKeBFbHzPSA-oUqxGzZY"
 )
 
+AUTHENTICATION_BACKENDS = (
+    'social_core.backends.facebook.FacebookOAuth2',
+    'django.contrib.auth.backends.ModelBackend',
+)
+
+# Facebook configuration
+SOCIAL_AUTH_FACEBOOK_KEY = '1839977833028435'
+SOCIAL_AUTH_FACEBOOK_SECRET = 'b176f57154785f3371eb213bae9e770b'
+
+# Define SOCIAL_AUTH_FACEBOOK_SCOPE to get extra permissions from Facebook.
+# Email is not sent by default, to get it, you must request the email permission.
+SOCIAL_AUTH_FACEBOOK_SCOPE = ['email']
+SOCIAL_AUTH_FACEBOOK_PROFILE_EXTRA_PARAMS = {
+    'fields': 'id, name, email, picture.type(large)'
+}
+
+SOCIAL_AUTH_PIPELINE = (
+    'social_core.pipeline.social_auth.social_details',
+    'social_core.pipeline.social_auth.social_uid',
+    'social_core.pipeline.social_auth.auth_allowed',
+    'social_core.pipeline.social_auth.social_user',
+    'social_core.pipeline.user.get_username',
+    'social_core.pipeline.user.create_user',
+    'coreapp.social_auth_pipeline.create_user_by_type',  # <--- set the path to the function
+    'social_core.pipeline.social_auth.associate_user',
+    'social_core.pipeline.social_auth.load_extra_data',
+    'social_core.pipeline.user.user_details',
+)
+
+STRIPE_API_KEY = 'YOUR_STRIPE_SECRET_KEY'
+
 # Configure Django app for Heroku
-import django_heroku
-django_heroku.settings(locals())
+#import django_heroku
+#django_heroku.settings(locals())
